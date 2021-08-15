@@ -10,8 +10,8 @@ CREATE TABLE hm_catchspam (
 
 ## Requirements
 
-RvdH's DNS resolver (https://d-fault.nl/files/DNSResolverComponent_1.3.exe.zip)
-RvdH's Disconnect.exe (https://d-fault.nl/files/Disconnect.zip)
+* RvdH's DNS resolver (https://d-fault.nl/files/DNSResolverComponent_1.3.exe.zip)
+* RvdH's Disconnect.exe (https://d-fault.nl/files/Disconnect.zip)
 
 
 ## Instructions
