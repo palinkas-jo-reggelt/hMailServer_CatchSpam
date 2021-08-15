@@ -1,5 +1,6 @@
 # hMailServer_CatchSpam
- 
+
+```
 CREATE TABLE hm_catchspam (
   timestamp datetime NOT NULL DEFAULT current_timestamp(),
   domain varchar(25) NOT NULL,
@@ -7,6 +8,7 @@ CREATE TABLE hm_catchspam (
   safe int(1) NOT NULL,
   PRIMARY KEY (domain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
 
 ## Requirements
 
