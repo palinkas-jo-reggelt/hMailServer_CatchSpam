@@ -5,7 +5,7 @@ CREATE TABLE hm_catchspam (
   timestamp datetime NOT NULL DEFAULT current_timestamp(),
   domain varchar(25) NOT NULL,
   hits int(1) NOT NULL,
-  safe int(1) NOT NULL,
+  safe int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (domain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```

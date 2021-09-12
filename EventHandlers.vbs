@@ -1,5 +1,41 @@
 Option Explicit
 
+Function Include(sInstFile)
+	Dim f, s, oFSO
+	Set oFSO = CreateObject("Scripting.FileSystemObject")
+	On Error Resume Next
+	If oFSO.FileExists(sInstFile) Then
+		Set f = oFSO.OpenTextFile(sInstFile)
+		s = f.ReadAll
+		f.Close
+		ExecuteGlobal s
+	End If
+	On Error Goto 0
+	Set f = Nothing
+	Set oFSO = Nothing
+End Function
+
+Function Lookup(strRegEx, strMatch) : Lookup = False
+	With CreateObject("VBScript.RegExp")
+		.Pattern = strRegEx
+		.Global = False
+		.MultiLine = True
+		.IgnoreCase = True
+		If .Test(strMatch) Then Lookup = True
+	End With
+End Function
+
+Function oLookup(strRegEx, strMatch, bGlobal)
+	If strRegEx = "" Then strRegEx = StrReverse(strMatch)
+	With CreateObject("VBScript.RegExp")
+		.Pattern = strRegEx
+		.Global = bGlobal
+		.MultiLine = True
+		.IgnoreCase = True
+		Set oLookup = .Execute(strMatch)
+	End With
+End Function
+
 Function CatchSpam(spamDomain)
 	Dim strSQL, oDB : Set oDB = GetDatabaseObject
 	strSQL = "INSERT INTO hm_catchspam (domain,hits) VALUES ('" & spamDomain & "',1) ON DUPLICATE KEY UPDATE hits=(hits+1),timestamp=NOW();"
@@ -58,59 +94,59 @@ Function GetMainDomain(strDomain)
 End Function
 
 Function LockFile(strPath)
-   Const Append = 8
-   Const Unicode = -1
-   Dim i
-   On Error Resume Next
-   With CreateObject("Scripting.FileSystemObject")
-      For i = 0 To 30
-         Err.Clear
-         Set LockFile = .OpenTextFile(strPath, Append, True, Unicode)
-         If (Not Err.Number = 70) Then Exit For
-         Wait(1)
-      Next
-   End With
-   If (Err.Number = 70) Then
-      EventLog.Write( "ERROR: EventHandlers.vbs" )
-      EventLog.Write( "File " & strPath & " is locked and timeout was exceeded." )
-      Err.Clear
-   ElseIf (Err.Number <> 0) Then
-      EventLog.Write( "ERROR: EventHandlers.vbs : Function LockFile" )
-      EventLog.Write( "Error       : " & Err.Number )
-      EventLog.Write( "Error (hex) : 0x" & Hex(Err.Number) )
-      EventLog.Write( "Source      : " & Err.Source )
-      EventLog.Write( "Description : " & Err.Description )
-      Err.Clear
-   End If
-   On Error Goto 0
+	Const Append = 8
+	Const Unicode = -1
+	Dim i
+	On Error Resume Next
+	With CreateObject("Scripting.FileSystemObject")
+		For i = 0 To 30
+			Err.Clear
+			Set LockFile = .OpenTextFile(strPath, Append, True, Unicode)
+			If (Not Err.Number = 70) Then Exit For
+			Wait(1)
+		Next
+	End With
+	If (Err.Number = 70) Then
+		EventLog.Write( "ERROR: EventHandlers.vbs" )
+		EventLog.Write( "File " & strPath & " is locked and timeout was exceeded." )
+		Err.Clear
+	ElseIf (Err.Number <> 0) Then
+		EventLog.Write( "ERROR: EventHandlers.vbs : Function LockFile" )
+		EventLog.Write( "Error       : " & Err.Number )
+		EventLog.Write( "Error (hex) : 0x" & Hex(Err.Number) )
+		EventLog.Write( "Source      : " & Err.Source )
+		EventLog.Write( "Description : " & Err.Description )
+		Err.Clear
+	End If
+	On Error Goto 0
 End Function
 
 Function AutoBan(sIPAddress, sReason, iDuration, sType) : AutoBan = False
-   '
-   '   sType can be one of the following;
-   '   "yyyy" Year, "m" Month, "d" Day, "h" Hour, "n" Minute, "s" Second
-   '
-   Dim oApp : Set oApp = CreateObject("hMailServer.Application")
-   Call oApp.Authenticate(ADMIN, hMSPASSWORD)
-   With LockFile(TEMPDIR & "\autoban.lck")
-      On Error Resume Next
-      Dim oSecurityRange : Set oSecurityRange = oApp.Settings.SecurityRanges.ItemByName("(" & sReason & ") " & sIPAddress)
-      If Err.Number = 9 Then
-         With oApp.Settings.SecurityRanges.Add
-            .Name = "(" & sReason & ") " & sIPAddress
-            .LowerIP = sIPAddress
-            .UpperIP = sIPAddress
-            .Priority = 20
-            .Expires = True
-            .ExpiresTime = DateAdd(sType, iDuration, Now())
-            .Save
-         End With
-         AutoBan = True
-      End If
-      On Error Goto 0
-      .Close
-   End With
-   Set oApp = Nothing
+	'
+	'   sType can be one of the following;
+	'   "yyyy" Year, "m" Month, "d" Day, "h" Hour, "n" Minute, "s" Second
+	'
+	Dim oApp : Set oApp = CreateObject("hMailServer.Application")
+	Call oApp.Authenticate(ADMIN, hMSPASSWORD)
+	With LockFile(TEMPDIR & "\autoban.lck")
+		On Error Resume Next
+		Dim oSecurityRange : Set oSecurityRange = oApp.Settings.SecurityRanges.ItemByName("(" & sReason & ") " & sIPAddress)
+		If Err.Number = 9 Then
+			With oApp.Settings.SecurityRanges.Add
+				.Name = "(" & sReason & ") " & sIPAddress
+				.LowerIP = sIPAddress
+				.UpperIP = sIPAddress
+				.Priority = 20
+				.Expires = True
+				.ExpiresTime = DateAdd(sType, iDuration, Now())
+				.Save
+			End With
+			AutoBan = True
+		End If
+		On Error Goto 0
+		.Close
+	End With
+	Set oApp = Nothing
 End Function
 
 Function Disconnect(sIPAddress)
