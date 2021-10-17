@@ -1,6 +1,6 @@
 Option Explicit
 
-Private Const TEMPDIR = "D:\hMailServer\Events"
+Private Const TEMPDIR = "C:\tmp"  'MUST EXIST
 
 Function Include(sInstFile)
 	Dim f, s, oFSO
