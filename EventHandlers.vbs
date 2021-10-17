@@ -1,5 +1,7 @@
 Option Explicit
 
+Private Const TEMPDIR = "D:\hMailServer\Events"
+
 Function Include(sInstFile)
 	Dim f, s, oFSO
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
@@ -236,7 +238,7 @@ End Sub
 
 Sub OnAcceptMessage(oClient, oMessage)
 
-	Dim strRegEx, Match, Matches
+	Dim strRegEx, Match, Matches, PTR_Record
 
 	REM	- Grab PTR-Record
 	PTR_Record = PTRLookup(oClient.IPAddress)
