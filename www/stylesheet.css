@@ -115,7 +115,7 @@ a:hover {
 table.section {
 	border-collapse: collapse;
 	border: 1px solid black;
-	border-spacing: 10px
+	border-spacing: 10px;
 	width: 100%;
 	font-size: 10pt;
 	}
